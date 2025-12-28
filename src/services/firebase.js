@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getAuth } from 'firebase/auth'; // ← Plus simple, sans persistence
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuration Firebase
 const firebaseConfig = {
@@ -17,10 +16,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth avec persistence
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
+// Initialize Auth SANS persistence AsyncStorage
+// L'utilisateur sera déconnecté après fermeture de l'app
+export const auth = getAuth(app);
 
 // Initialize Firestore avec config optimisée pour React Native
 export const db = initializeFirestore(app, {
