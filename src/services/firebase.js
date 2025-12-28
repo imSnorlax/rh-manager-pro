@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,14 +17,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth avec persistence AsyncStorage
-// Cela permet de garder l'utilisateur connecté même après fermeture de l'app
+// Initialize Auth avec persistence
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
 
-// Initialize autres services
-export const db = getFirestore(app);
+// Initialize Firestore avec config optimisée pour React Native
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true, // Fix pour React Native
+});
+
+// Initialize Storage
 export const storage = getStorage(app);
 
 export default app;

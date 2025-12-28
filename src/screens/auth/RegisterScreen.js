@@ -10,6 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { COLORS } from '../../utils/colors';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -52,12 +54,15 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    // Email validation simple
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       Alert.alert('Erreur', 'Email invalide');
       return;
     }
+
+    // Dismiss keyboard
+    Keyboard.dismiss();
 
     setLoading(true);
     const result = await register(formData.email.trim(), formData.password, {
@@ -69,10 +74,7 @@ export default function RegisterScreen({ navigation }) {
     setLoading(false);
 
     if (result.success) {
-      Alert.alert('Succès', 'Compte créé avec succès!', [
-        { text: 'OK' }
-      ]);
-      // AuthContext va gérer la navigation automatiquement
+      Alert.alert('Succès', 'Compte créé avec succès!');
     } else {
       Alert.alert('Erreur', result.error || 'Erreur lors de l\'inscription');
     }
@@ -82,158 +84,176 @@ export default function RegisterScreen({ navigation }) {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
+      keyboardVerticalOffset={0}
     >
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.emoji}>📝</Text>
-          <Text style={styles.title}>Créer un compte</Text>
-          <Text style={styles.subtitle}>Rejoignez RH Manager Pro</Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.form}>
-          {/* First Name */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Prénom *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Votre prénom"
-              placeholderTextColor={COLORS.textLight}
-              value={formData.firstName}
-              onChangeText={(text) => updateField('firstName', text)}
-              autoCapitalize="words"
-            />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.emoji}>📝</Text>
+            <Text style={styles.title}>Créer un compte</Text>
+            <Text style={styles.subtitle}>Rejoignez RH Manager Pro</Text>
           </View>
 
-          {/* Last Name */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Nom *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Votre nom"
-              placeholderTextColor={COLORS.textLight}
-              value={formData.lastName}
-              onChangeText={(text) => updateField('lastName', text)}
-              autoCapitalize="words"
-            />
-          </View>
-
-          {/* Email */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="exemple@email.com"
-              placeholderTextColor={COLORS.textLight}
-              value={formData.email}
-              onChangeText={(text) => updateField('email', text)}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          {/* Phone */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Téléphone</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="+212 6XX XXX XXX"
-              placeholderTextColor={COLORS.textLight}
-              value={formData.phone}
-              onChangeText={(text) => updateField('phone', text)}
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          {/* Role Selection */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Rôle *</Text>
-            <View style={styles.roleContainer}>
-              {Object.values(ROLES).map((role) => (
-                <TouchableOpacity
-                  key={role}
-                  style={[
-                    styles.roleButton,
-                    formData.role === role && styles.roleButtonActive,
-                  ]}
-                  onPress={() => updateField('role', role)}
-                >
-                  <Text
-                    style={[
-                      styles.roleButtonText,
-                      formData.role === role && styles.roleButtonTextActive,
-                    ]}
-                  >
-                    {ROLE_LABELS[role]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Password */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mot de passe *</Text>
-            <View style={styles.passwordContainer}>
+          {/* Form */}
+          <View style={styles.form}>
+            {/* First Name */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Prénom *</Text>
               <TextInput
-                style={styles.passwordInput}
-                placeholder="Min. 6 caractères"
+                style={styles.input}
+                placeholder="Votre prénom"
                 placeholderTextColor={COLORS.textLight}
-                value={formData.password}
-                onChangeText={(text) => updateField('password', text)}
+                value={formData.firstName}
+                onChangeText={(text) => updateField('firstName', text)}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Last Name */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Nom *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Votre nom"
+                placeholderTextColor={COLORS.textLight}
+                value={formData.lastName}
+                onChangeText={(text) => updateField('lastName', text)}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Email */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="exemple@email.com"
+                placeholderTextColor={COLORS.textLight}
+                value={formData.email}
+                onChangeText={(text) => updateField('email', text)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Phone */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Téléphone</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="+212 6XX XXX XXX"
+                placeholderTextColor={COLORS.textLight}
+                value={formData.phone}
+                onChangeText={(text) => updateField('phone', text)}
+                keyboardType="phone-pad"
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Role Selection */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Rôle *</Text>
+              <View style={styles.roleContainer}>
+                {Object.values(ROLES).map((role) => (
+                  <TouchableOpacity
+                    key={role}
+                    style={[
+                      styles.roleButton,
+                      formData.role === role && styles.roleButtonActive,
+                    ]}
+                    onPress={() => updateField('role', role)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.roleButtonText,
+                        formData.role === role && styles.roleButtonTextActive,
+                      ]}
+                    >
+                      {ROLE_LABELS[role]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Password */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Mot de passe *</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Min. 6 caractères"
+                  placeholderTextColor={COLORS.textLight}
+                  value={formData.password}
+                  onChangeText={(text) => updateField('password', text)}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  returnKeyType="next"
+                />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.eyeButton}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Confirm Password */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Confirmer mot de passe *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirmez votre mot de passe"
+                placeholderTextColor={COLORS.textLight}
+                value={formData.confirmPassword}
+                onChangeText={(text) => updateField('confirmPassword', text)}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
+                returnKeyType="done"
+                onSubmitEditing={handleRegister}
               />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
-              >
-                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-              </TouchableOpacity>
             </View>
+
+            {/* Register Button */}
+            <TouchableOpacity
+              style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+              onPress={handleRegister}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color={COLORS.textWhite} />
+              ) : (
+                <Text style={styles.registerButtonText}>S'inscrire</Text>
+              )}
+            </TouchableOpacity>
           </View>
 
-          {/* Confirm Password */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirmer mot de passe *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmez votre mot de passe"
-              placeholderTextColor={COLORS.textLight}
-              value={formData.confirmPassword}
-              onChangeText={(text) => updateField('confirmPassword', text)}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Vous avez déjà un compte ? </Text>
+            <TouchableOpacity 
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.loginLink}>Se connecter</Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Register Button */}
-          <TouchableOpacity
-            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={COLORS.textWhite} />
-            ) : (
-              <Text style={styles.registerButtonText}>S'inscrire</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Vous avez déjà un compte ? </Text>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.loginLink}>Se connecter</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
@@ -244,7 +264,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   scrollContent: {
+    flexGrow: 1,
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
@@ -267,10 +289,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   form: {
-    marginBottom: 20,
+    width: '100%',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
     fontSize: 14,
@@ -359,8 +381,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
     marginTop: 20,
-    marginBottom: 30,
   },
   footerText: {
     fontSize: 14,
